@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg
+*.egg-info/
+dist/
+build/
+
+# Virtual environment
+venv/
+.venv/
+env/
+
+# Environment variables — NEVER commit secrets
+.env
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE
+.vscode/
+.idea/
+
+# Temp/output files
+output.html
+submit_empty.html
+assign_missing.html
+overview_out.html
+activity_out.html
+tools_out.html
+intel_out.html
+CrimeDatabase_updates.zip

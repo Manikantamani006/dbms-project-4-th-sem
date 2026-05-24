@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CrimeDatabase - LIVE_ACTIVITY</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&amp;family=Geist:wght@400;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        body {
+            background-color: #111318;
+            overflow-x: hidden;
+        }
+        /* CRT Scanline Effect */
+        .scanline-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: linear-gradient(
+                rgba(18, 16, 16, 0) 50%,
+                rgba(0, 0, 0, 0.05) 50%
+            ), linear-gradient(
+                90deg,
+                rgba(255, 0, 0, 0.01),
+                rgba(0, 255, 0, 0.01),
+                rgba(0, 0, 255, 0.01)
+            );
+            background-size: 100% 4px, 3px 100%;
+            pointer-events: none;
+            z-index: 100;
+        }
+        .block-shadow-sm {
+            box-shadow: 4px 4px 0px 0px rgba(0,0,0,1);
+        }
+        .block-shadow-md {
+            box-shadow: 8px 8px 0px 0px rgba(0,0,0,1);
+        }
+        .active-glitch {
+            animation: flicker 0.15s infinite;
+        }
+        @keyframes flicker {
+            0% { opacity: 0.9; }
+            50% { opacity: 1; }
+            100% { opacity: 0.9; }
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface": "#111318",
+                        "secondary-fixed": "#79ff5b",
+                        "secondary-container": "#2ff801",
+                        "primary-container": "#00f0ff",
+                        "surface-bright": "#37393e",
+                        "on-secondary-container": "#0f6d00",
+                        "inverse-on-surface": "#2f3035",
+                        "on-tertiary-container": "#805600",
+                        "on-tertiary-fixed-variant": "#614000",
+                        "on-tertiary-fixed": "#281800",
+                        "on-surface": "#e2e2e8",
+                        "on-background": "#e2e2e8",
+                        "surface-container-highest": "#333539",
+                        "primary-fixed-dim": "#00dbe9",
+                        "outline-variant": "#3b494b",
+                        "primary-fixed": "#7df4ff",
+                        "on-error-container": "#ffdad6",
+                        "on-surface-variant": "#b9cacb",
+                        "on-tertiary": "#432c00",
+                        "tertiary-fixed": "#ffddaf",
+                        "on-secondary-fixed-variant": "#095300",
+                        "inverse-surface": "#e2e2e8",
+                        "outline": "#849495",
+                        "surface-variant": "#333539",
+                        "tertiary": "#fff4e9",
+                        "error": "#ffb4ab",
+                        "on-primary-container": "#006970",
+                        "surface-container-low": "#1a1c20",
+                        "on-secondary": "#053900",
+                        "surface-dim": "#111318",
+                        "tertiary-container": "#ffd290",
+                        "error-container": "#93000a",
+                        "primary": "#dbfcff",
+                        "inverse-primary": "#006970",
+                        "on-error": "#690005",
+                        "secondary-fixed-dim": "#2ae500",
+                        "surface-container": "#1e2024",
+                        "on-primary-fixed": "#002022",
+                        "surface-container-lowest": "#0c0e12",
+                        "surface-container-high": "#282a2e",
+                        "on-primary": "#00363a",
+                        "on-primary-fixed-variant": "#004f54",
+                        "surface-tint": "#00dbe9",
+                        "secondary": "#d7ffc5",
+                        "tertiary-fixed-dim": "#ffba43",
+                        "on-secondary-fixed": "#022100",
+                        "background": "#111318"
+                    },
+                    "fontFamily": {
+                        "label-caps": ["JetBrains Mono"],
+                        "body-lg": ["Geist"],
+                        "body-md": ["Geist"],
+                        "headline-lg": ["JetBrains Mono"],
+                        "data-mono": ["JetBrains Mono"],
+                        "headline-md": ["JetBrains Mono"]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface font-body-md selection:bg-primary-container selection:text-on-primary-container">
+<div class="scanline-overlay"></div>
+<!-- TopAppBar -->
+<header class="bg-surface border-b-2 border-primary-container w-full shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex justify-between items-center px-margin py-4 fixed top-0 left-0 z-[60]">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-primary-container" data-icon="terminal">terminal</span>
+<h1 class="font-headline-md text-headline-md tracking-widest uppercase text-primary-container font-bold">CrimeDatabase</h1>
+</div>
+<div class="flex items-center gap-6">
+<div class="hidden md:flex gap-8 items-center">
+<a class="font-label-caps text-label-caps uppercase text-on-surface-variant hover:text-primary-container transition-colors" href="/">OVERVIEW</a>
+<a class="font-label-caps text-label-caps uppercase text-primary-container border-b-2 border-primary-container" href="/activity">ACTIVITY</a>
+<a class="font-label-caps text-label-caps uppercase text-on-surface-variant hover:text-primary-container transition-colors" href="/tools">TOOLS</a>
+<a class="font-label-caps text-label-caps uppercase text-on-surface-variant hover:text-primary-container transition-colors" href="/intel">INTEL</a>
+</div>
+<button class="active:translate-x-0.5 active:translate-y-0.5 transition-transform duration-75">
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="settings">settings</span>
+</button>
+</div>
+</header>
+<main class="pt-24 pb-32 px-margin max-w-container-max mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8">
+<!-- Left Sidebar: System Stats -->
+<aside class="lg:col-span-3 space-y-6">
+<section class="border-2 border-primary-container bg-surface-container block-shadow-sm">
+<div class="bg-primary-container px-4 py-1">
+<h2 class="font-label-caps text-label-caps text-on-primary-container font-bold">SYSTEM_STATUS</h2>
+</div>
+<div class="p-4 space-y-4">
+<div class="flex justify-between items-center">
+<span class="font-data-mono text-on-surface-variant uppercase">Uptime</span>
+<span class="font-data-mono text-primary-container">99.98%</span>
+</div>
+<div class="flex justify-between items-center">
+<span class="font-data-mono text-on-surface-variant uppercase">Encryption</span>
+<span class="font-data-mono text-secondary-container">ACTIVE</span>
+</div>
+<div class="h-1 bg-surface-container-highest w-full mt-2">
+<div class="h-full bg-primary-container w-[72%]"></div>
+</div>
+<p class="font-data-mono text-[10px] text-on-surface-variant uppercase leading-tight">Processing node 091-B... Data streaming via encrypted burst link.</p>
+</div>
+</section>
+<section class="border-2 border-error-container bg-surface-container block-shadow-sm">
+<div class="bg-error-container px-4 py-1">
+<h2 class="font-label-caps text-label-caps text-on-error-container font-bold">EMERGENCY_ZONES</h2>
+</div>
+<div class="p-0">
+<div class="border-b border-outline-variant p-4 flex items-center justify-between">
+<span class="font-data-mono text-on-surface">Sector 4 (Industrial)</span>
+<span class="px-2 py-1 bg-error-container text-error text-[10px] font-bold uppercase">Critical</span>
+</div>
+<div class="p-4 flex items-center justify-between">
+<span class="font-data-mono text-on-surface">Sector 9 (Transit)</span>
+<span class="px-2 py-1 bg-on-tertiary-container text-tertiary-container text-[10px] font-bold uppercase">Moderate</span>
+</div>
+</div>
+</section>
+</aside>
+<!-- Center: Active Docket Scroll -->
+<div class="lg:col-span-6 space-y-6">
+<header class="flex items-center justify-between mb-4">
+<div class="flex items-center gap-4">
+<div class="w-3 h-3 bg-secondary-container rounded-full active-glitch"></div>
+<h2 class="font-headline-md text-headline-md text-on-surface tracking-tighter uppercase">Active Docket</h2>
+</div>
+<button class="border-2 border-outline px-4 py-1 font-label-caps text-label-caps uppercase text-on-surface hover:bg-surface-variant transition-all block-shadow-sm">
+                    Filter_Feed
+                </button>
+</header>
+<div class="space-y-4">
+{% if fir_logs %}
+{% for fir in fir_logs %}
+<div class="border-2 {% if fir[3] == 'Critical' %}border-on-surface{% else %}border-outline-variant{% endif %} bg-surface-container block-shadow-sm {% if fir[3] == 'Critical' %}hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]{% endif %} transition-all cursor-pointer">
+  <div class="flex items-center border-b {% if fir[3] == 'Critical' %}border-on-surface{% else %}border-outline-variant{% endif %}">
+    <div class="{% if fir[3] == 'Critical' %}bg-on-surface text-surface{% else %}bg-outline-variant text-on-surface{% endif %} px-4 py-1 font-data-mono text-sm font-bold">{{ fir[1] }}</div>
+    <div class="flex-1 px-4 font-data-mono text-sm text-primary-container font-bold">FIR-{{ '%05d' % fir[0] }}</div>
+    <div class="px-4 py-1 font-label-caps text-[10px] font-bold border-l uppercase
+      {% if fir[3] == 'Critical' %}bg-error-container text-error border-on-surface
+      {% elif fir[3] == 'Resolved' %}bg-surface-bright text-secondary-container border-outline-variant
+      {% elif fir[3] == 'Investigating' %}bg-surface-bright text-primary-container border-outline-variant
+      {% else %}bg-surface-bright text-on-surface-variant border-outline-variant{% endif %}">
+      {{ fir[3] }}
+    </div>
+  </div>
+  <div class="p-4">
+    <h3 class="font-headline-md text-[16px] text-on-surface uppercase leading-tight mb-1">{{ fir[2][:80] }}{% if fir[2]|length > 80 %}...{% endif %}</h3>
+    <p class="font-body-md text-on-surface-variant text-sm">Filed: {{ fir[1] }} &nbsp;|&nbsp; Status: <span class="{% if fir[3] == 'Critical' %}text-error{% elif fir[3] == 'Resolved' %}text-secondary-container{% else %}text-primary-container{% endif %}">{{ fir[3] }}</span></p>
+  </div>
+</div>
+{% endfor %}
+{% else %}
+<div class="flex flex-col items-center justify-center h-48 border-2 border-outline-variant bg-surface-container text-on-surface-variant font-data-mono text-sm uppercase tracking-widest">
+  <span class="material-symbols-outlined text-4xl mb-3 opacity-30">inbox</span>
+  NO ACTIVE FIR RECORDS FOUND
+</div>
+{% endif %}
+</div>
+</div>
+<!-- Right Sidebar: Intel & Visuals -->
+<aside class="lg:col-span-3 space-y-6">
+<section class="border-2 border-primary-container bg-surface-container block-shadow-sm overflow-hidden">
+<div class="bg-primary-container px-4 py-1">
+<h2 class="font-label-caps text-label-caps text-on-primary-container font-bold">INTEL_SURVEILLANCE</h2>
+</div>
+<div class="relative h-48 bg-black">
+<img alt="CCTV Feed" class="w-full h-full object-cover opacity-60 grayscale brightness-125" data-alt="A gritty high-contrast grainy CCTV security camera view of a dark industrial alleyway at night. The image features a monochromatic blue-green aesthetic with visible scanlines and a timestamp overlay in a blocky monospace font. The lighting is harsh and artificial, casting long deep shadows across the concrete, creating a tense tactical atmosphere." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDqtXq1qzU-eclhbFEoR90HCSaQQ7uS-MY3FOvMOJjZ29HBoKHSZK3Xzlbg2py997b1_v28UdvhLQL9VxNXixW3tsf-LbcPH--8afNamcIrfDIm1kXii8aZ5_EbLWWo0cJCD3WdJjX5oDAIt48q3hfF_57TWRoSEhKu3blM64mqGf3YjfmsAJG7_N2rJ2sc_vOywfvctg9TtspkDUyq7m9c8uIUITBHpg7-wAG9zSVUUdr4hH4MDCGVQt95jS9tnAJJz4znOkcqBnVD"/>
+<div class="absolute top-2 left-2 flex items-center gap-2">
+<div class="w-2 h-2 bg-error rounded-full animate-pulse"></div>
+<span class="font-data-mono text-[10px] text-error font-bold uppercase">Live_Feed_07</span>
+</div>
+<div class="absolute bottom-0 left-0 right-0 bg-black/60 p-2 border-t border-primary-container/30">
+<p class="font-data-mono text-[10px] text-primary-container uppercase">ID: UNKNOWN_TARGET_DETECTED</p>
+</div>
+</div>
+<div class="p-4">
+<p class="font-data-mono text-[11px] text-on-surface-variant uppercase mb-4 leading-tight">Biometric scanners active. Cross-referencing facial data with federal database...</p>
+<button class="w-full bg-surface border border-primary-container py-2 font-label-caps text-label-caps text-primary-container hover:bg-primary-container hover:text-on-primary-container transition-all">
+                        RUN_BIOMETRIC_CHECK
+                    </button>
+</div>
+</section>
+<section class="border-2 border-outline-variant bg-surface-container block-shadow-sm">
+<div class="bg-surface-bright px-4 py-1">
+<h2 class="font-label-caps text-label-caps text-on-surface font-bold uppercase">Tactical_Map</h2>
+</div>
+<div class="p-2">
+<div class="h-40 bg-surface-container-highest border border-outline-variant relative overflow-hidden flex items-center justify-center">
+<div class="absolute inset-0 opacity-20 pointer-events-none" style="background-image: radial-gradient(circle, #00f0ff 1px, transparent 1px); background-size: 20px 20px;"></div>
+<div class="z-10 text-center">
+<span class="material-symbols-outlined text-primary-container text-4xl" data-icon="location_searching">location_searching</span>
+<p class="font-data-mono text-[10px] mt-2 text-primary-container uppercase tracking-widest">Tracking_Enabled</p>
+</div>
+<!-- Static data dots -->
+<div class="absolute top-10 left-10 w-2 h-2 bg-error"></div>
+<div class="absolute bottom-12 right-15 w-2 h-2 bg-secondary-container"></div>
+</div>
+<div class="mt-4 grid grid-cols-2 gap-2">
+<div class="p-2 border border-outline-variant">
+<div class="text-[9px] font-label-caps text-on-surface-variant uppercase">Long</div>
+<div class="font-data-mono text-xs text-on-surface">34.0522° N</div>
+</div>
+<div class="p-2 border border-outline-variant">
+<div class="text-[9px] font-label-caps text-on-surface-variant uppercase">Lat</div>
+<div class="font-data-mono text-xs text-on-surface">118.2437° W</div>
+</div>
+</div>
+</div>
+</section>
+</aside>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-gutter py-2 bg-surface border-t-2 border-primary-container shadow-[0px_-4px_0px_0px_rgba(0,0,0,1)]">
+<a class="flex flex-col items-center justify-center text-on-surface-variant p-2 border-2 border-transparent hover:border-secondary-container hover:text-secondary-container transition-all duration-100" href="/">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-label-caps text-label-caps uppercase mt-1">OVERVIEW</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-secondary-container text-on-secondary-container p-2 translate-x-[-2px] translate-y-[-2px] shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] border-2 border-on-secondary-container transition-all duration-100" href="/activity">
+<span class="material-symbols-outlined" data-icon="list_alt">list_alt</span>
+<span class="font-label-caps text-label-caps uppercase mt-1">ACTIVITY</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant p-2 border-2 border-transparent hover:border-secondary-container hover:text-secondary-container transition-all duration-100" href="/tools">
+<span class="material-symbols-outlined" data-icon="grid_view">grid_view</span>
+<span class="font-label-caps text-label-caps uppercase mt-1">TOOLS</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant p-2 border-2 border-transparent hover:border-secondary-container hover:text-secondary-container transition-all duration-100" href="/intel">
+<span class="material-symbols-outlined" data-icon="insights">insights</span>
+<span class="font-label-caps text-label-caps uppercase mt-1">INTEL</span>
+</a>
+</nav>
+<!-- FAB -->
+<button class="fixed bottom-24 right-8 w-14 h-14 bg-primary-container text-on-primary-container border-2 border-on-surface block-shadow-sm flex items-center justify-center hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] active:translate-x-0 active:translate-y-0 transition-all z-40">
+<span class="material-symbols-outlined scale-125" data-icon="add_alert">add_alert</span>
+</button>
+<script>
+        // Micro-interactions for terminal-like feel
+        document.querySelectorAll('button').forEach(btn => {
+            btn.addEventListener('mousedown', () => {
+                const clickSound = new Audio('data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YV9vT19v');
+                // Optional: Play a short blip sound here if we had one
+            });
+        });
+
+        // Simulating incoming data feed
+        setInterval(() => {
+            const time = new Date().toLocaleTimeString('en-GB', { hour12: false });
+            const clock = document.querySelector('.bg-on-surface.text-surface');
+            if(clock) clock.textContent = time;
+        }, 1000);
+    </script>
+</body></html>

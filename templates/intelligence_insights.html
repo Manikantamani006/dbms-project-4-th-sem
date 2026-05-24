@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CrimeDatabase | INTEL_INSIGHTS</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&amp;family=Geist:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface": "#111318",
+                    "secondary-fixed": "#79ff5b",
+                    "secondary-container": "#2ff801",
+                    "primary-container": "#00f0ff",
+                    "surface-bright": "#37393e",
+                    "on-secondary-container": "#0f6d00",
+                    "inverse-on-surface": "#2f3035",
+                    "on-tertiary-container": "#805600",
+                    "on-tertiary-fixed-variant": "#614000",
+                    "on-tertiary-fixed": "#281800",
+                    "on-surface": "#e2e2e8",
+                    "on-background": "#e2e2e8",
+                    "surface-container-highest": "#333539",
+                    "primary-fixed-dim": "#00dbe9",
+                    "outline-variant": "#3b494b",
+                    "primary-fixed": "#7df4ff",
+                    "on-error-container": "#ffdad6",
+                    "on-surface-variant": "#b9cacb",
+                    "on-tertiary": "#432c00",
+                    "tertiary-fixed": "#ffddaf",
+                    "on-secondary-fixed-variant": "#095300",
+                    "inverse-surface": "#e2e2e8",
+                    "outline": "#849495",
+                    "surface-variant": "#333539",
+                    "tertiary": "#fff4e9",
+                    "error": "#ffb4ab",
+                    "on-primary-container": "#006970",
+                    "surface-container-low": "#1a1c20",
+                    "on-secondary": "#053900",
+                    "surface-dim": "#111318",
+                    "tertiary-container": "#ffd290",
+                    "error-container": "#93000a",
+                    "primary": "#dbfcff",
+                    "inverse-primary": "#006970",
+                    "on-error": "#690005",
+                    "secondary-fixed-dim": "#2ae500",
+                    "surface-container": "#1e2024",
+                    "on-primary-fixed": "#002022",
+                    "surface-container-high": "#282a2e",
+                    "on-primary": "#00363a",
+                    "on-primary-fixed-variant": "#004f54",
+                    "surface-tint": "#00dbe9",
+                    "secondary": "#d7ffc5",
+                    "tertiary-fixed-dim": "#ffba43",
+                    "on-secondary-fixed": "#022100",
+                    "background": "#111318"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "margin": "24px",
+                    "gutter": "16px",
+                    "container-max": "1440px",
+                    "unit": "4px"
+            },
+            "fontFamily": {
+                    "label-caps": ["JetBrains Mono"],
+                    "body-lg": ["Geist"],
+                    "body-md": ["Geist"],
+                    "headline-lg": ["JetBrains Mono"],
+                    "data-mono": ["JetBrains Mono"],
+                    "headline-md": ["JetBrains Mono"]
+            },
+            "fontSize": {
+                    "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.1em", "fontWeight": "600"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "letterSpacing": "0em", "fontWeight": "400"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "letterSpacing": "0em", "fontWeight": "400"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "data-mono": ["14px", {"lineHeight": "20px", "letterSpacing": "0em", "fontWeight": "500"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "0em", "fontWeight": "700"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            background-color: #111318;
+            color: #e2e2e8;
+            overflow-x: hidden;
+        }
+
+        /* CRT Scanlines Overlay */
+        .scanlines {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                rgba(18, 16, 16, 0) 50%,
+                rgba(0, 0, 0, 0.1) 50%
+            ),
+            linear-gradient(
+                90deg,
+                rgba(255, 0, 0, 0.02),
+                rgba(0, 255, 0, 0.01),
+                rgba(0, 0, 255, 0.02)
+            );
+            background-size: 100% 3px, 3px 100%;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        /* Tactical Borders & Block Shadows */
+        .tactical-box {
+            border: 2px solid #00f0ff;
+            background-color: #111318;
+            box-shadow: 4px 4px 0px 0px rgba(0,0,0,1);
+            position: relative;
+        }
+
+        .header-bar {
+            background-color: #004f54;
+            border-bottom: 2px solid #00f0ff;
+            padding: 4px 12px;
+        }
+
+        .pixel-grid {
+            background-image: 
+                linear-gradient(#3b494b 1px, transparent 1px),
+                linear-gradient(90deg, #3b494b 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        .crimson-flicker {
+            animation: flicker 0.2s infinite alternate;
+        }
+
+        @keyframes flicker {
+            0% { opacity: 0.8; }
+            100% { opacity: 1; }
+        }
+
+        .glitch-text {
+            text-shadow: 2px 0 #93000a, -2px 0 #00f0ff;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #111318; }
+        ::-webkit-scrollbar-thumb { background: #00f0ff; border: 2px solid #111318; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="font-body-md text-body-md">
+<div class="scanlines"></div>
+<!-- Top Navigation -->
+<header class="bg-surface border-b-2 border-primary-container w-full shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex justify-between items-center px-margin py-4 fixed top-0 z-50">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-primary-container" style="font-variation-settings: 'FILL' 1;">terminal</span>
+<h1 class="font-headline-md text-headline-md tracking-tighter uppercase text-primary-container font-bold tracking-widest">CrimeDatabase</h1>
+</div>
+<div class="flex items-center gap-6">
+<nav class="hidden md:flex gap-8 font-label-caps text-label-caps uppercase">
+<a class="text-on-surface-variant hover:text-primary-container active:translate-x-0.5 active:translate-y-0.5 transition-transform duration-75" href="/">Overview</a>
+<a class="text-on-surface-variant hover:text-primary-container active:translate-x-0.5 active:translate-y-0.5 transition-transform duration-75" href="/activity">Activity</a>
+<a class="text-on-surface-variant hover:text-primary-container active:translate-x-0.5 active:translate-y-0.5 transition-transform duration-75" href="/tools">Tools</a>
+<a class="text-primary-container active:translate-x-0.5 active:translate-y-0.5 transition-transform duration-75 border-b-2 border-primary-container" href="/intel">Intel</a>
+</nav>
+<span class="material-symbols-outlined text-primary-container cursor-pointer">settings</span>
+</div>
+</header>
+<main class="pt-32 pb-24 px-margin max-w-container-max mx-auto">
+<div class="grid grid-cols-1 md:grid-cols-12 gap-gutter">
+<!-- LEFT COLUMN: HEATMAP VISUALIZATION -->
+<div class="md:col-span-8 space-y-gutter">
+<section class="tactical-box overflow-hidden">
+<div class="header-bar flex justify-between items-center">
+<span class="font-label-caps text-label-caps text-primary uppercase">SECTOR_HEATMAP_V.042</span>
+<div class="flex gap-2">
+<div class="w-3 h-3 bg-error crimson-flicker"></div>
+<span class="text-[10px] font-label-caps text-error">LIVE_DATA_FEED</span>
+</div>
+</div>
+<div class="h-[500px] pixel-grid relative bg-surface-container-lowest p-gutter flex items-center justify-center overflow-hidden">
+<!-- Simulated Map Interface -->
+<div class="absolute inset-0 opacity-20 pointer-events-none">
+<img class="w-full h-full object-cover grayscale" data-alt="A gritty, high-contrast black and white satellite map of a dense urban city grid. The perspective is top-down with sharp architectural lines and stark shadows, emphasizing a mechanical and surveillance-style aesthetic consistent with a retro tactical command interface. No colors, only deep blacks and varying shades of charcoal grey." data-location="New York" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCf5CwNjNWjDR9mlzvGWg4sAT8pew8ALKS0kSajrqEpRTrQMqEwsqblfeBXcSEr5LW-IFl5N-8kUeYiMPgIgtkfS8zoz1f9KnlueuFQgI2DuCW9tu46COxdDB0Ve6Ul6XNjPEV6e7SGP5NWlPkmtXPeOZJydK8gbvU0Q8YmkBiyHJ339iYl1LqPTMNR0y7seYUE7WKQgMJxEhTmn3vD3m7ADyvoV-9HDY85rD5znCzr1S-dO50ObADfECod4MxPcC6XzE66-3Nz6S_A"/>
+</div>
+<!-- Heatmap Data Points (CSS Drawn) -->
+<div class="relative w-full h-full">
+<!-- Sector Grid Lines -->
+<div class="absolute inset-0 flex flex-wrap opacity-40">
+<div class="w-1/4 h-1/4 border-[0.5px] border-primary-container flex items-start p-1 text-[8px] font-data-mono text-primary-container">SEC_A1</div>
+<div class="w-1/4 h-1/4 border-[0.5px] border-primary-container flex items-start p-1 text-[8px] font-data-mono text-primary-container">SEC_A2</div>
+<div class="w-1/4 h-1/4 border-[0.5px] border-primary-container flex items-start p-1 text-[8px] font-data-mono text-primary-container">SEC_A3</div>
+<div class="w-1/4 h-1/4 border-[0.5px] border-primary-container flex items-start p-1 text-[8px] font-data-mono text-primary-container">SEC_A4</div>
+<div class="w-1/4 h-1/4 border-[0.5px] border-primary-container flex items-start p-1 text-[8px] font-data-mono text-primary-container">SEC_B1</div>
+<div class="w-1/4 h-1/4 border-[0.5px] border-primary-container flex items-start p-1 text-[8px] font-data-mono text-primary-container">SEC_B2</div>
+<div class="w-1/4 h-1/4 border-[0.5px] border-primary-container flex items-start p-1 text-[8px] font-data-mono text-primary-container">SEC_B3</div>
+<div class="w-1/4 h-1/4 border-[0.5px] border-primary-container flex items-start p-1 text-[8px] font-data-mono text-primary-container">SEC_B4</div>
+</div>
+<!-- Heatmap 'Points' -->
+<!-- High Activity (Crimson) -->
+<div class="absolute top-1/4 left-1/3 w-16 h-16 bg-error-container/40 border-2 border-error crimson-flicker flex items-center justify-center">
+<span class="text-[10px] font-data-mono text-error font-bold">CRITICAL</span>
+</div>
+<div class="absolute top-1/2 left-2/3 w-20 h-20 bg-error-container/30 border-2 border-error crimson-flicker"></div>
+<!-- Low/Standard Activity (Neon Blue) -->
+<div class="absolute top-1/2 left-1/4 w-12 h-12 bg-primary-container/20 border-2 border-primary-container shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"></div>
+<div class="absolute bottom-1/4 right-1/4 w-24 h-24 bg-primary-container/10 border-2 border-primary-container"></div>
+<!-- Tactical Markers -->
+<div class="absolute top-10 right-20 text-primary-container flex flex-col items-center">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">person_pin</span>
+<span class="text-[8px] font-data-mono bg-surface border border-primary-container px-1 uppercase">Unit_77</span>
+</div>
+<div class="absolute bottom-20 left-40 text-primary-container flex flex-col items-center">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">local_police</span>
+<span class="text-[8px] font-data-mono bg-surface border border-primary-container px-1 uppercase">Unit_12</span>
+</div>
+</div>
+<!-- Scan Overlay -->
+<div class="absolute bottom-4 left-4 right-4 h-12 bg-surface-container-high border-2 border-primary-fixed flex items-center px-4 gap-4">
+<span class="text-primary-fixed font-data-mono text-label-caps">SCANNING COORDINATES: 40.7128° N, 74.0060° W</span>
+<div class="flex-1 h-2 bg-surface-container border border-primary-fixed-dim relative overflow-hidden">
+<div class="absolute top-0 left-0 h-full bg-primary-fixed-dim w-3/4 animate-[pulse_2s_infinite]"></div>
+</div>
+</div>
+</div>
+</section>
+<!-- Recommendation Cards (Bento Style) -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-gutter">
+<div class="tactical-box">
+<div class="header-bar">
+<span class="font-label-caps text-label-caps text-primary uppercase">PATROL_ADVISORY</span>
+</div>
+<div class="p-4 space-y-3">
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-secondary-container">route</span>
+<p class="font-data-mono text-on-surface text-sm uppercase">Redirection recommended for Unit_12 to Sector_B3 due to increased erratic signal density.</p>
+</div>
+<button class="w-full py-2 bg-primary-container text-on-primary-container font-label-caps border-2 border-on-primary-container active:translate-x-0.5 active:translate-y-0.5 transition-all shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] uppercase">Authorize_Reroute</button>
+</div>
+</div>
+<div class="tactical-box border-error">
+<div class="header-bar bg-error-container border-error">
+<span class="font-label-caps text-label-caps text-on-error-container uppercase">URGENT_INTERCEPT</span>
+</div>
+<div class="p-4 space-y-3">
+<div class="flex items-start gap-3">
+<span class="material-symbols-outlined text-error">warning</span>
+<p class="font-data-mono text-on-surface text-sm uppercase">Multiple unregistered telemetry packets detected in restricted perimeter Sector_A1.</p>
+</div>
+<button class="w-full py-2 bg-error text-on-error font-label-caps border-2 border-on-error active:translate-x-0.5 active:translate-y-0.5 transition-all shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] uppercase">Deploy_Rapid_Response</button>
+</div>
+</div>
+</div>
+</div>
+<!-- RIGHT COLUMN: SUMMARY & INTEL -->
+<div class="md:col-span-4 space-y-gutter">
+<section class="tactical-box">
+<div class="header-bar">
+<span class="font-label-caps text-label-caps text-primary uppercase">TACTICAL_SUMMARY_V2</span>
+</div>
+<div class="p-4 font-data-mono space-y-4 text-sm uppercase leading-tight">
+<div class="flex justify-between border-b border-surface-variant pb-2">
+<span class="text-on-surface-variant">Total FIRs:</span>
+<span class="text-primary-container font-bold">{{ total_firs }}</span>
+</div>
+<div class="flex justify-between border-b border-surface-variant pb-2">
+<span class="text-on-surface-variant">Critical:</span>
+<span class="text-error font-bold">{{ critical_firs }}</span>
+</div>
+<div class="flex justify-between border-b border-surface-variant pb-2">
+<span class="text-on-surface-variant">Pending:</span>
+<span class="text-secondary-fixed">{{ status_counts.get('Pending', 0) }}</span>
+</div>
+<div class="flex justify-between border-b border-surface-variant pb-2">
+<span class="text-on-surface-variant">Investigating:</span>
+<span class="text-primary-fixed">{{ status_counts.get('Investigating', 0) }}</span>
+</div>
+<div class="flex justify-between border-b border-surface-variant pb-2">
+<span class="text-on-surface-variant">Resolved:</span>
+<span class="text-secondary-container">{{ status_counts.get('Resolved', 0) }}</span>
+</div>
+{% if recent_intel %}
+<div class="mt-4 space-y-2">
+  <div class="text-[10px] text-on-surface-variant border-l-2 border-primary-container pl-2 mb-3">RECENT_INTEL_LOGS:</div>
+  {% for fir in recent_intel %}
+  <div class="border-l-2 {% if fir['status'] == 'Critical' %}border-error{% elif fir['status'] == 'Resolved' %}border-secondary-container{% else %}border-primary-container{% endif %} pl-2 py-1 bg-surface-container">
+    <div class="text-[9px] text-on-surface-variant">#{{ fir['fir_id'] }} // {{ fir['date_filed'] }}</div>
+    <div class="text-[11px] text-on-surface">{{ fir['description'][:55] }}{% if fir['description']|length > 55 %}...{% endif %}</div>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+</div>
+</section>
+<section class="tactical-box">
+<div class="header-bar">
+<span class="font-label-caps text-label-caps text-primary uppercase">ACTIVE_HOTSPOTS</span>
+</div>
+<div class="p-0">
+<table class="w-full text-left font-data-mono text-[12px] uppercase">
+<thead>
+<tr class="bg-surface-container border-b-2 border-primary-container">
+<th class="p-2 text-on-surface-variant">SECTOR</th>
+<th class="p-2 text-on-surface-variant">THREAT</th>
+<th class="p-2 text-on-surface-variant">LVL</th>
+</tr>
+</thead>
+<tbody>
+<tr class="border-b border-surface-variant hover:bg-surface-container-high transition-colors">
+<td class="p-2 text-primary">SEC_01_A</td>
+<td class="p-2">Narcotics</td>
+<td class="p-2"><span class="bg-error-container text-error px-2 py-0.5 border border-error">HIGH</span></td>
+</tr>
+<tr class="border-b border-surface-variant hover:bg-surface-container-high transition-colors">
+<td class="p-2 text-primary">SEC_04_C</td>
+<td class="p-2">Vandalism</td>
+<td class="p-2"><span class="bg-surface-container-highest text-on-surface-variant px-2 py-0.5 border border-outline">LOW</span></td>
+</tr>
+<tr class="border-b border-surface-variant hover:bg-surface-container-high transition-colors">
+<td class="p-2 text-primary">SEC_09_B</td>
+<td class="p-2">Burglary</td>
+<td class="p-2"><span class="bg-on-tertiary-container text-tertiary-container px-2 py-0.5 border border-tertiary-container">MED</span></td>
+</tr>
+<tr class="border-b border-surface-variant hover:bg-surface-container-high transition-colors">
+<td class="p-2 text-primary">SEC_02_D</td>
+<td class="p-2">Armed Assault</td>
+<td class="p-2"><span class="bg-error-container text-error px-2 py-0.5 border border-error">CRITICAL</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+<!-- System Stats Chip -->
+<div class="p-4 border-2 border-secondary-container bg-surface flex items-center justify-between shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-secondary-container">verified</span>
+<div class="flex flex-col">
+<span class="font-label-caps text-[10px] text-on-surface-variant">ENCRYPTION_STATUS</span>
+<span class="font-data-mono text-secondary-container text-xs">AES-256_ACTIVE</span>
+</div>
+</div>
+<span class="font-data-mono text-xs text-on-surface-variant">VER: 9.0.22</span>
+</div>
+</div>
+</div>
+</main>
+<!-- Bottom Navigation Bar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-gutter py-2 bg-surface border-t-2 border-primary-container shadow-[0px_-4px_0px_0px_rgba(0,0,0,1)]">
+<a class="flex flex-col items-center justify-center text-on-surface-variant p-2 border-2 border-transparent hover:border-secondary-container hover:text-secondary-container transition-all duration-100 cursor-pointer" href="/">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-label-caps text-label-caps uppercase">OVERVIEW</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant p-2 border-2 border-transparent hover:border-secondary-container hover:text-secondary-container transition-all duration-100 cursor-pointer" href="/activity">
+<span class="material-symbols-outlined" data-icon="list_alt">list_alt</span>
+<span class="font-label-caps text-label-caps uppercase">ACTIVITY</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant p-2 border-2 border-transparent hover:border-secondary-container hover:text-secondary-container transition-all duration-100 cursor-pointer" href="/tools">
+<span class="material-symbols-outlined" data-icon="grid_view">grid_view</span>
+<span class="font-label-caps text-label-caps uppercase">TOOLS</span>
+</a>
+<a class="flex flex-col items-center justify-center bg-secondary-container text-on-secondary-container p-2 translate-x-[-2px] translate-y-[-2px] shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] border-2 border-on-secondary-container transition-all duration-100 cursor-pointer" href="/intel">
+<span class="material-symbols-outlined" data-icon="insights" style="font-variation-settings: 'FILL' 1;">insights</span>
+<span class="font-label-caps text-label-caps uppercase">INTEL</span>
+</a>
+</nav>
+<!-- FAB Action (Contextual: Insights View) -->
+<button class="fixed bottom-24 right-8 w-16 h-16 bg-primary-container border-2 border-on-primary-container shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex items-center justify-center active:translate-x-1 active:translate-y-1 active:shadow-none transition-all z-40">
+<span class="material-symbols-outlined text-on-primary-container text-4xl" data-icon="file_download">file_download</span>
+</button>
+<script>
+        // Simple Interaction: Click effect for heatmap points
+        document.querySelectorAll('.tactical-box').forEach(box => {
+            box.addEventListener('mousedown', () => {
+                box.style.transform = 'translate(1px, 1px)';
+                box.style.boxShadow = '2px 2px 0px 0px rgba(0,0,0,1)';
+            });
+            box.addEventListener('mouseup', () => {
+                box.style.transform = 'translate(0, 0)';
+                box.style.boxShadow = '4px 4px 0px 0px rgba(0,0,0,1)';
+            });
+        });
+
+        // Atmospheric flickering effect for 'Live' data points
+        setInterval(() => {
+            const heatmapPoints = document.querySelectorAll('.crimson-flicker');
+            heatmapPoints.forEach(p => {
+                p.style.opacity = Math.random() > 0.1 ? '1' : '0.4';
+            });
+        }, 150);
+    </script>
+</body></html>

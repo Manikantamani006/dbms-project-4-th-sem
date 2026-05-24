@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CrimeDatabase - OPERATIONAL_TOOLS</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Geist:wght@400;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        "colors": {
+          "surface": "#111318",
+          "secondary-fixed": "#79ff5b",
+          "secondary-container": "#2ff801",
+          "primary-container": "#00f0ff",
+          "surface-bright": "#37393e",
+          "on-secondary-container": "#0f6d00",
+          "inverse-on-surface": "#2f3035",
+          "on-tertiary-container": "#805600",
+          "on-surface": "#e2e2e8",
+          "on-background": "#e2e2e8",
+          "surface-container-highest": "#333539",
+          "primary-fixed-dim": "#00dbe9",
+          "outline-variant": "#3b494b",
+          "primary-fixed": "#7df4ff",
+          "on-error-container": "#ffdad6",
+          "on-surface-variant": "#b9cacb",
+          "tertiary-container": "#ffd290",
+          "error-container": "#93000a",
+          "primary": "#dbfcff",
+          "inverse-primary": "#006970",
+          "on-error": "#690005",
+          "surface-container": "#1e2024",
+          "surface-container-low": "#1a1c20",
+          "surface-container-lowest": "#0c0e12",
+          "on-primary-container": "#006970",
+          "on-primary-fixed-variant": "#004f54",
+          "surface-tint": "#00dbe9",
+          "secondary": "#d7ffc5",
+          "outline": "#849495",
+          "error": "#ffb4ab",
+          "background": "#111318",
+          "on-surface-variant": "#b9cacb"
+        },
+        "fontFamily": {
+          "label-caps": ["JetBrains Mono"],
+          "body-lg": ["Geist"],
+          "body-md": ["Geist"],
+          "headline-lg": ["JetBrains Mono"],
+          "data-mono": ["JetBrains Mono"],
+          "headline-md": ["JetBrains Mono"]
+        },
+        "fontSize": {
+          "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.1em", "fontWeight": "600"}],
+          "body-md": ["16px", {"lineHeight": "24px", "letterSpacing": "0em", "fontWeight": "400"}],
+          "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+          "data-mono": ["14px", {"lineHeight": "20px", "letterSpacing": "0em", "fontWeight": "500"}],
+          "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "0em", "fontWeight": "700"}]
+        }
+      }
+    }
+  }
+</script>
+<style>
+  body { background-color: #111318; margin: 0; padding: 0; overflow-x: hidden; min-height: max(884px, 100dvh); }
+  .scanlines {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: linear-gradient(rgba(18,16,16,0) 50%, rgba(0,0,0,0.07) 50%);
+    background-size: 100% 4px; z-index: 100; pointer-events: none;
+  }
+  .block-shadow-sm { box-shadow: 4px 4px 0px 0px rgba(0,0,0,1); }
+  .block-shadow-md { box-shadow: 8px 8px 0px 0px rgba(0,0,0,1); }
+  .btn-tactical:active { transform: translate(2px,2px); box-shadow: 0px 0px 0px 0px rgba(0,0,0,1); }
+  ::-webkit-scrollbar { width: 8px; }
+  ::-webkit-scrollbar-track { background: #111318; }
+  ::-webkit-scrollbar-thumb { background: #00f0ff; border: 2px solid #111318; }
+
+  /* Toast notification */
+  .toast { position: fixed; top: 88px; right: 24px; z-index: 300; padding: 12px 20px;
+    font-family: 'JetBrains Mono'; font-size: 13px; font-weight: 600; text-transform: uppercase;
+    border: 2px solid; box-shadow: 4px 4px 0 rgba(0,0,0,1); animation: slideIn .3s ease; }
+  @keyframes slideIn { from { transform: translateX(120%); opacity:0; } to { transform: translateX(0); opacity:1; } }
+
+  /* Search result row hover */
+  .result-row:hover { background: rgba(0,240,255,0.06); }
+
+  /* Modal backdrop */
+  .modal-open { overflow: hidden; }
+</style>
+</head>
+<body class="bg-background text-on-surface font-body-md">
+<div class="scanlines"></div>
+
+<!-- ═══════════════════════ TOAST NOTIFICATION ═══════════════════════ -->
+{% if success %}
+<div id="toast" class="toast bg-surface-container border-secondary-container text-secondary-container">
+  <span class="material-symbols-outlined text-sm align-middle mr-2">check_circle</span>{{ success.replace('+', ' ') }}
+</div>
+{% elif error %}
+<div id="toast" class="toast bg-surface-container border-error text-error">
+  <span class="material-symbols-outlined text-sm align-middle mr-2">error</span>{{ error.replace('+', ' ') }}
+</div>
+{% endif %}
+
+<!-- ══════════════════════════ HEADER ══════════════════════════ -->
+<header class="bg-surface text-primary-container font-headline-md text-headline-md tracking-tighter uppercase border-b-2 border-primary-container w-full shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex justify-between items-center px-6 py-4 sticky top-0 z-50">
+  <div class="flex items-center gap-4">
+    <span class="material-symbols-outlined text-4xl">terminal</span>
+    <span class="font-headline-md text-headline-md text-primary-container font-bold tracking-widest">CrimeDatabase</span>
+  </div>
+  <div class="flex items-center gap-6">
+    <nav class="hidden md:flex gap-8 font-label-caps text-label-caps uppercase">
+      <a class="text-on-surface-variant hover:text-primary-container transition-colors" href="/">OVERVIEW</a>
+      <a class="text-on-surface-variant hover:text-primary-container transition-colors" href="/activity">ACTIVITY</a>
+      <a class="text-primary-container underline underline-offset-8" href="/tools">TOOLS</a>
+      <a class="text-on-surface-variant hover:text-primary-container transition-colors" href="/intel">INTEL</a>
+    </nav>
+  </div>
+</header>
+
+<!-- ══════════════════════════ MAIN ══════════════════════════ -->
+<main class="max-w-[1440px] mx-auto px-6 py-8 mb-24">
+
+  <!-- Dashboard Header -->
+  <div class="mb-10 flex flex-col md:flex-row justify-between items-end border-l-4 border-primary-container pl-6">
+    <div>
+      <h1 class="font-headline-lg text-headline-lg uppercase mb-2">OPERATIONAL_TOOLS</h1>
+      <p class="font-data-mono text-data-mono text-on-surface-variant uppercase tracking-widest">System Status: [ ACTIVE ] // Protocol: RMS_ALPHA_9</p>
+    </div>
+    <div class="mt-4 md:mt-0 font-data-mono text-data-mono bg-surface-container-highest px-4 py-2 border-2 border-on-surface block-shadow-sm">
+      UTC: <span id="current-time">--:--:--</span>
+    </div>
+  </div>
+
+  <!-- ══════════ 2×2 TOOL GRID ══════════ -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+
+    <!-- ─── TOOL 1: REGISTER FIR ─── -->
+    <section class="border-2 border-primary-container bg-surface flex flex-col block-shadow-md">
+      <div class="bg-primary-container text-on-primary-container px-4 py-2 font-headline-md text-headline-md flex justify-between items-center">
+        <span class="uppercase">REGISTER_FIR</span>
+        <span class="material-symbols-outlined">app_registration</span>
+      </div>
+      <div class="p-6 flex flex-col flex-grow">
+        <p class="font-body-md text-on-surface-variant mb-5">Initialize a First Information Report — creates a permanent immutable record in the central repository.</p>
+
+        <form action="/submit_fir" method="POST" class="flex flex-col gap-4 flex-grow">
+          <!-- Description -->
+          <div>
+            <label class="font-label-caps text-label-caps text-on-surface-variant block mb-2">INCIDENT_DESCRIPTION <span class="text-error">*</span></label>
+            <textarea name="description" required rows="4"
+              placeholder="Describe the incident..."
+              class="w-full bg-surface-container-low border-2 border-outline-variant focus:border-primary-container text-on-surface font-data-mono p-3 outline-none resize-none transition-colors"></textarea>
+          </div>
+          <!-- Status -->
+          <div>
+            <label class="font-label-caps text-label-caps text-on-surface-variant block mb-2">INITIAL_STATUS</label>
+            <select name="status" class="w-full bg-surface-container-low border-2 border-outline-variant focus:border-primary-container text-on-surface font-data-mono p-3 outline-none">
+              <option value="Pending">Pending</option>
+              <option value="Investigating">Investigating</option>
+              <option value="Critical">Critical</option>
+            </select>
+          </div>
+          <!-- Submit -->
+          <button type="submit"
+            class="mt-auto btn-tactical w-full bg-primary-container text-on-primary-container border-2 border-black py-4 font-headline-md text-headline-md uppercase font-bold block-shadow-sm hover:translate-x-[-2px] hover:translate-y-[-2px] transition-all">
+            COMMENCE_ENTRY
+          </button>
+        </form>
+      </div>
+    </section>
+
+    <!-- ─── TOOL 2: ASSIGN / UPDATE CASE ─── -->
+    <section class="border-2 border-secondary-container bg-surface flex flex-col block-shadow-md">
+      <div class="bg-secondary-container text-on-secondary-container px-4 py-2 font-headline-md text-headline-md flex justify-between items-center">
+        <span class="uppercase">ASSIGN_CASE</span>
+        <span class="material-symbols-outlined">assignment_ind</span>
+      </div>
+      <div class="p-6 flex flex-col flex-grow">
+        <p class="font-body-md text-on-surface-variant mb-5">Update the status of an existing FIR — assign to investigation, mark critical, or resolve.</p>
+
+        <form action="/assign_case" method="POST" class="flex flex-col gap-4 flex-grow">
+          <!-- FIR ID -->
+          <div>
+            <label class="font-label-caps text-label-caps text-on-surface-variant block mb-2">FIR_ID <span class="text-error">*</span></label>
+            <input type="number" name="fir_id" required min="1"
+              placeholder="Enter FIR number e.g. 42"
+              class="w-full bg-surface-container-low border-2 border-outline-variant focus:border-secondary-container text-on-surface font-data-mono p-3 outline-none transition-colors"/>
+          </div>
+          <!-- New Status -->
+          <div>
+            <label class="font-label-caps text-label-caps text-on-surface-variant block mb-2">NEW_STATUS <span class="text-error">*</span></label>
+            <select name="new_status" class="w-full bg-surface-container-low border-2 border-outline-variant focus:border-secondary-container text-on-surface font-data-mono p-3 outline-none">
+              <option value="Pending">Pending</option>
+              <option value="Investigating">Investigating</option>
+              <option value="Critical">Critical</option>
+              <option value="Resolved">Resolved</option>
+            </select>
+          </div>
+          <!-- Recent FIRs quick reference -->
+          {% if recent_firs %}
+          <div class="bg-surface-container-lowest border border-outline-variant p-3 text-[11px] font-data-mono text-on-surface-variant max-h-28 overflow-y-auto">
+            <div class="text-[10px] text-on-surface-variant mb-2 uppercase tracking-widest">Recent FIRs for reference:</div>
+            {% for f in recent_firs %}
+            <div class="flex gap-3 border-b border-outline-variant py-1 last:border-0">
+              <span class="text-secondary-container">#{{ f['fir_id'] }}</span>
+              <span class="text-on-surface truncate flex-1">{{ f['description'][:60] }}{% if f['description']|length > 60 %}…{% endif %}</span>
+              <span class="shrink-0 {% if f['status'] == 'Critical' %}text-error{% elif f['status'] == 'Resolved' %}text-outline{% else %}text-primary-container{% endif %}">{{ f['status'] }}</span>
+            </div>
+            {% endfor %}
+          </div>
+          {% endif %}
+          <!-- Submit -->
+          <button type="submit"
+            class="mt-auto btn-tactical w-full bg-secondary-container text-on-secondary-container border-2 border-black py-4 font-headline-md text-headline-md uppercase font-bold block-shadow-sm hover:translate-x-[-2px] hover:translate-y-[-2px] transition-all">
+            UPDATE_STATUS
+          </button>
+        </form>
+      </div>
+    </section>
+
+    <!-- ─── TOOL 3: DB SEARCH ─── -->
+    <section class="border-2 border-on-surface bg-surface flex flex-col block-shadow-md">
+      <div class="bg-surface-container-highest text-on-surface px-4 py-2 font-headline-md text-headline-md flex justify-between items-center border-b-2 border-on-surface">
+        <span class="uppercase">DB_QUERY</span>
+        <span class="material-symbols-outlined">manage_search</span>
+      </div>
+      <div class="p-6 flex flex-col flex-grow gap-4">
+        <p class="font-body-md text-on-surface-variant">Search by FIR ID (number) or keyword in description.</p>
+
+        <!-- Search Form -->
+        <div class="flex gap-2">
+          <input id="search-input" type="text"
+            placeholder="ENTER FIR_ID or KEYWORD..."
+            class="flex-1 bg-surface-container-lowest border-2 border-on-surface-variant focus:border-primary-container text-primary-container font-data-mono p-3 outline-none transition-colors"/>
+          <button onclick="runSearch()"
+            class="btn-tactical bg-surface-container-highest border-2 border-on-surface text-on-surface px-6 font-headline-md uppercase font-bold hover:bg-on-surface hover:text-background transition-all">
+            EXEC
+          </button>
+        </div>
+
+        <!-- Results Panel -->
+        <div id="search-results" class="flex-grow bg-surface-container-lowest border-2 border-outline-variant min-h-[160px] overflow-y-auto">
+          <div id="search-placeholder" class="flex flex-col items-center justify-center h-40 text-on-surface-variant font-data-mono text-[12px] uppercase tracking-widest">
+            <span class="material-symbols-outlined text-4xl mb-2 opacity-40">search</span>
+            AWAITING QUERY INPUT
+          </div>
+          <div id="search-loader" class="hidden flex-col items-center justify-center h-40 text-primary-container font-data-mono text-[12px] uppercase">
+            <span class="material-symbols-outlined animate-spin text-3xl mb-2">progress_activity</span>
+            SCANNING DATABASE...
+          </div>
+          <table id="search-table" class="hidden w-full border-collapse text-[13px] font-data-mono">
+            <thead>
+              <tr class="bg-surface-container border-b-2 border-outline-variant text-on-surface-variant">
+                <th class="text-left p-3">ID</th>
+                <th class="text-left p-3">DATE</th>
+                <th class="text-left p-3">DESCRIPTION</th>
+                <th class="text-left p-3">STATUS</th>
+              </tr>
+            </thead>
+            <tbody id="search-tbody"></tbody>
+          </table>
+          <div id="search-empty" class="hidden flex flex-col items-center justify-center h-32 text-on-surface-variant font-data-mono text-[12px] uppercase">
+            <span class="material-symbols-outlined text-3xl mb-2 opacity-40">find_in_page</span>
+            NO RECORDS FOUND
+          </div>
+          <div id="search-error-msg" class="hidden p-4 text-error font-data-mono text-[12px]"></div>
+        </div>
+
+        <button onclick="runSearch()"
+          class="mt-auto btn-tactical w-full bg-surface-container-highest border-2 border-on-surface text-on-surface py-4 font-headline-md text-headline-md uppercase font-bold hover:bg-on-surface hover:text-background transition-all block-shadow-sm">
+          EXECUTE_SEARCH
+        </button>
+      </div>
+    </section>
+
+    <!-- ─── TOOL 4: INCIDENT ALERT ─── -->
+    <section class="border-2 border-error bg-surface flex flex-col block-shadow-md">
+      <div class="bg-error text-on-error px-4 py-2 font-headline-md text-headline-md flex justify-between items-center">
+        <span class="uppercase">INCIDENT_ALERT</span>
+        <span class="material-symbols-outlined">emergency</span>
+      </div>
+      <div class="p-6 flex flex-col flex-grow">
+        <p class="font-body-md text-on-surface-variant mb-5">Broadcast a high-priority alert by registering it as a Critical FIR immediately.</p>
+
+        <form action="/submit_fir" method="POST" class="flex flex-col gap-4 flex-grow">
+          <input type="hidden" name="status" value="Critical"/>
+
+          <div class="inline-block bg-error text-on-error px-3 py-1 font-label-caps text-label-caps w-fit">PRIORITY_ALPHA</div>
+
+          <div>
+            <label class="font-label-caps text-label-caps text-on-surface-variant block mb-2">ALERT_MESSAGE <span class="text-error">*</span></label>
+            <textarea name="description" required rows="4"
+              placeholder="Describe the critical incident requiring immediate response..."
+              class="w-full bg-surface-container-low border-2 border-error/50 focus:border-error text-on-surface font-data-mono p-3 outline-none resize-none transition-colors"></textarea>
+          </div>
+
+          <button type="submit"
+            class="mt-auto btn-tactical w-full border-2 border-error text-error py-4 font-headline-md text-headline-md uppercase font-bold hover:bg-error hover:text-on-error transition-all block-shadow-sm">
+            TRIGGER_BROADCAST
+          </button>
+        </form>
+      </div>
+    </section>
+
+  </div><!-- end grid -->
+
+  <!-- ══════════ TERMINAL LOG STREAM ══════════ -->
+  <div class="mt-12 border-2 border-on-surface-variant bg-surface-container-low p-4 block-shadow-sm">
+    <div class="flex items-center gap-2 mb-4 border-b border-on-surface-variant pb-2">
+      <span class="material-symbols-outlined text-sm">terminal</span>
+      <span class="font-label-caps text-label-caps uppercase">TERMINAL_LOG_STREAM</span>
+    </div>
+    <div id="terminal-log" class="font-data-mono text-[13px] text-on-surface-variant space-y-1">
+      <p><span class="text-secondary-container" id="t1">[--:--:--]</span> SYSTEM_INIT: Operational tools module loaded.</p>
+      <p><span class="text-secondary-container" id="t2">[--:--:--]</span> DB_SYNC: Remote repository connection established.</p>
+      <p><span class="text-primary-container" id="t3">[--:--:--]</span> USER_AUTH: Commander validated for FIR operations.</p>
+      <p><span class="text-on-surface-variant">[READY]</span> Awaiting operator input...</p>
+      <div class="flex items-center">
+        <span class="text-primary-container">&gt;</span>
+        <span class="ml-2 animate-pulse">_</span>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- ══════════════════════ BOTTOM NAV ══════════════════════ -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 py-2 bg-surface border-t-2 border-primary-container shadow-[0px_-4px_0px_0px_rgba(0,0,0,1)]">
+  <a class="flex flex-col items-center justify-center text-on-surface-variant p-2 border-2 border-transparent" href="/">
+    <span class="material-symbols-outlined">dashboard</span>
+    <span class="font-label-caps text-label-caps uppercase">OVERVIEW</span>
+  </a>
+  <a class="flex flex-col items-center justify-center text-on-surface-variant p-2 border-2 border-transparent" href="/activity">
+    <span class="material-symbols-outlined">list_alt</span>
+    <span class="font-label-caps text-label-caps uppercase">ACTIVITY</span>
+  </a>
+  <a class="flex flex-col items-center justify-center bg-secondary-container text-on-secondary-container p-2 border-2 border-on-secondary-container" href="/tools">
+    <span class="material-symbols-outlined">grid_view</span>
+    <span class="font-label-caps text-label-caps uppercase">TOOLS</span>
+  </a>
+  <a class="flex flex-col items-center justify-center text-on-surface-variant p-2 border-2 border-transparent" href="/intel">
+    <span class="material-symbols-outlined">insights</span>
+    <span class="font-label-caps text-label-caps uppercase">INTEL</span>
+  </a>
+</nav>
+
+<script>
+  // ── UTC Clock ──
+  function updateClock() {
+    const now = new Date();
+    const t = now.toISOString().split('T')[1].split('.')[0];
+    document.getElementById('current-time').textContent = t;
+    document.getElementById('t1').textContent = '[' + t + ']';
+    document.getElementById('t2').textContent = '[' + t + ']';
+    document.getElementById('t3').textContent = '[' + t + ']';
+  }
+  setInterval(updateClock, 1000);
+  updateClock();
+
+  // ── Auto-dismiss toast ──
+  const toast = document.getElementById('toast');
+  if (toast) setTimeout(() => { toast.style.opacity = '0'; toast.style.transition = 'opacity .5s'; setTimeout(() => toast.remove(), 500); }, 4000);
+
+  // ── Live DB Search ──
+  function runSearch() {
+    const q = document.getElementById('search-input').value.trim();
+    if (!q) return;
+
+    const placeholder = document.getElementById('search-placeholder');
+    const loader      = document.getElementById('search-loader');
+    const table       = document.getElementById('search-table');
+    const tbody       = document.getElementById('search-tbody');
+    const empty       = document.getElementById('search-empty');
+    const errMsg      = document.getElementById('search-error-msg');
+
+    placeholder.classList.add('hidden');
+    empty.classList.add('hidden');
+    table.classList.add('hidden');
+    errMsg.classList.add('hidden');
+    loader.classList.remove('hidden');
+    loader.classList.add('flex');
+
+    fetch('/api/search?q=' + encodeURIComponent(q))
+      .then(r => r.json())
+      .then(data => {
+        loader.classList.add('hidden');
+        loader.classList.remove('flex');
+        if (data.error) {
+          errMsg.textContent = 'ERROR: ' + data.error;
+          errMsg.classList.remove('hidden');
+          return;
+        }
+        if (!data.results || data.results.length === 0) {
+          empty.classList.remove('hidden');
+          empty.classList.add('flex');
+          return;
+        }
+        tbody.innerHTML = '';
+        data.results.forEach(row => {
+          const statusColor = row.status === 'Critical' ? 'text-error' :
+                              row.status === 'Resolved'  ? 'text-outline' :
+                              row.status === 'Investigating' ? 'text-secondary-container' :
+                              'text-primary-container';
+          const tr = document.createElement('tr');
+          tr.className = 'result-row border-b border-outline-variant cursor-pointer transition-colors';
+          tr.innerHTML = `
+            <td class="p-3 text-primary-container font-bold">#${row.fir_id}</td>
+            <td class="p-3 text-on-surface-variant">${row.date_filed}</td>
+            <td class="p-3 text-on-surface max-w-[200px] truncate">${row.description}</td>
+            <td class="p-3 ${statusColor} font-bold">${row.status}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+        table.classList.remove('hidden');
+      })
+      .catch(err => {
+        loader.classList.add('hidden');
+        loader.classList.remove('flex');
+        errMsg.textContent = 'NETWORK_ERROR: Could not reach database.';
+        errMsg.classList.remove('hidden');
+      });
+  }
+
+  // Allow Enter key in search input
+  document.getElementById('search-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') runSearch();
+  });
+
+  // ── Button micro-interactions ──
+  document.querySelectorAll('button, .btn-tactical').forEach(btn => {
+    btn.addEventListener('mousedown', () => { btn.style.transform = 'translate(2px, 2px)'; });
+    btn.addEventListener('mouseup',   () => { btn.style.transform = ''; });
+    btn.addEventListener('mouseleave',() => { btn.style.transform = ''; });
+  });
+</script>
+</body></html>

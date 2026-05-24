@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CrimeDatabase - Connection Error</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700;800&display=swap" rel="stylesheet"/>
+<style>
+  body { background:#111318; color:#e2e2e8; font-family:'JetBrains Mono',monospace; margin:0; min-height:100dvh; display:flex; align-items:center; justify-content:center; }
+</style>
+</head>
+<body>
+<div style="border:2px solid #ffb4ab;padding:40px;max-width:540px;text-align:center;box-shadow:8px 8px 0 #000;">
+  <div style="font-size:48px;margin-bottom:16px;">⚠</div>
+  <div style="color:#ffb4ab;font-size:12px;letter-spacing:.15em;text-transform:uppercase;margin-bottom:8px;">DATABASE_CONNECTION_FAILED</div>
+  <h1 style="font-size:20px;color:#e2e2e8;margin-bottom:16px;text-transform:uppercase;">CrimeDatabase</h1>
+  <p style="color:#b9cacb;font-size:13px;margin-bottom:24px;">{{ message }}</p>
+  <p style="color:#849495;font-size:11px;margin-bottom:24px;">Check that PostgreSQL is running and your .env credentials are correct.</p>
+  <a href="/" style="display:inline-block;background:#00f0ff;color:#006970;padding:10px 28px;font-weight:700;font-size:12px;letter-spacing:.1em;text-transform:uppercase;text-decoration:none;border:2px solid #006970;">RETRY</a>
+</div>
+</body></html>
